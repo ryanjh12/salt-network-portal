@@ -1,0 +1,143 @@
+[
+  {
+    "id": "ames-grace",
+    "name": "Grace Church Ames",
+    "city": "Ames",
+    "state": "IA",
+    "address": "123 Main St, Ames, IA 50010",
+    "website": "https://gracechurchames.com",
+    "yearPlanted": 2015,
+    "status": "Established",
+    "leadPastor": {
+      "name": "John Smith",
+      "email": "john@gracechurchames.com",
+      "phone": "515-555-0101"
+    },
+    "associatePastors": [
+      { "name": "Mike Johnson", "role": "Worship Pastor", "email": "mike@gracechurchames.com" }
+    ],
+    "attendance": {
+      "sundayAdults": 320,
+      "sundayKids": 85,
+      "totalAverage": 405
+    },
+    "saltCompany": {
+      "campus": "Iowa State University",
+      "weeklyAttendance": 150,
+      "director": "Sarah Lee",
+      "directorEmail": "sarah@gracechurchames.com"
+    },
+    "metrics": {
+      "baptismsLastYear": 18,
+      "smallGroups": 22,
+      "givingBudget": 850000
+    },
+    "networkCoach": "Pastor Dave Williams",
+    "notes": "Healthy church, exploring planting a daughter church in Des Moines."
+  },
+  {
+    "id": "lincoln-cornerstone",
+    "name": "Cornerstone Church Lincoln",
+    "city": "Lincoln",
+    "state": "NE",
+    "address": "456 Oak Ave, Lincoln, NE 68501",
+    "website": "https://cornerstonelnk.com",
+    "yearPlanted": 2018,
+    "status": "Growing",
+    "leadPastor": {
+      "name": "David Martinez",
+      "email": "david@cornerstonelnk.com",
+      "phone": "402-555-0202"
+    },
+    "associatePastors": [],
+    "attendance": {
+      "sundayAdults": 180,
+      "sundayKids": 40,
+      "totalAverage": 220
+    },
+    "saltCompany": {
+      "campus": "University of Nebraska",
+      "weeklyAttendance": 95,
+      "director": "Tom Reed",
+      "directorEmail": "tom@cornerstonelnk.com"
+    },
+    "metrics": {
+      "baptismsLastYear": 11,
+      "smallGroups": 12,
+      "givingBudget": 420000
+    },
+    "networkCoach": "Pastor Dave Williams",
+    "notes": ""
+  },
+  {
+    "id": "kansas-city-harvest",
+    "name": "Harvest Church Kansas City",
+    "city": "Kansas City",
+    "state": "MO",
+    "address": "789 Elm St, Kansas City, MO 64101",
+    "website": "",
+    "yearPlanted": 2021,
+    "status": "New Plant",
+    "leadPastor": {
+      "name": "Chris Nguyen",
+      "email": "chris@harvestkc.com",
+      "phone": "816-555-0303"
+    },
+    "associatePastors": [],
+    "attendance": {
+      "sundayAdults": 75,
+      "sundayKids": 15,
+      "totalAverage": 90
+    },
+    "saltCompany": {
+      "campus": "University of Missouri-KC",
+      "weeklyAttendance": 40,
+      "director": "Amy Chen",
+      "directorEmail": "amy@harvestkc.com"
+    },
+    "metrics": {
+      "baptismsLastYear": 5,
+      "smallGroups": 5,
+      "givingBudget": 180000
+    },
+    "networkCoach": "Pastor Lisa Park",
+    "notes": "First year post-launch, strong Salt Company momentum."
+  },
+  {
+    "id": "omaha-citylight",
+    "name": "CityLight Church Omaha",
+    "city": "Omaha",
+    "state": "NE",
+    "address": "321 Pine Blvd, Omaha, NE 68102",
+    "website": "https://citylightomaha.org",
+    "yearPlanted": 2012,
+    "status": "Established",
+    "leadPastor": {
+      "name": "Brian Foster",
+      "email": "brian@citylightomaha.org",
+      "phone": "402-555-0404"
+    },
+    "associatePastors": [
+      { "name": "Rachel Kim", "role": "Children's Pastor", "email": "rachel@citylightomaha.org" },
+      { "name": "Andrew Cole", "role": "College Pastor", "email": "andrew@citylightomaha.org" }
+    ],
+    "attendance": {
+      "sundayAdults": 510,
+      "sundayKids": 130,
+      "totalAverage": 640
+    },
+    "saltCompany": {
+      "campus": "University of Nebraska Omaha",
+      "weeklyAttendance": 210,
+      "director": "Andrew Cole",
+      "directorEmail": "andrew@citylightomaha.org"
+    },
+    "metrics": {
+      "baptismsLastYear": 34,
+      "smallGroups": 38,
+      "givingBudget": 1400000
+    },
+    "networkCoach": "Pastor Lisa Park",
+    "notes": "Network anchor church. Has planted 2 daughter churches."
+  }
+]

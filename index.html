@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Salt Network — Staff Portal</title>
+  <script src="config.js"></script>
+  <style>
+    @font-face {
+      font-family: 'Archivo';
+      src: url('assets/fonts/Archivo-VariableFont_wdth,wght.ttf') format('truetype');
+      font-weight: 100 900;
+    }
+    @font-face {
+      font-family: 'ArchivoNarrow';
+      src: url('assets/fonts/ArchivoNarrow-Bold.ttf') format('truetype');
+      font-weight: 700;
+    }
+    @font-face {
+      font-family: 'ArchivoNarrow';
+      src: url('assets/fonts/ArchivoNarrow-Regular.ttf') format('truetype');
+      font-weight: 400;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue:       #2756E0;
+      --blue-dark:  #1a3db5;
+      --blue-light: #e8eeff;
+      --lime:       #C8FF00;
+      --black:      #0d0d0d;
+      --dark:       #141414;
+      --surface:    #1e1e1e;
+      --card:       #ffffff;
+      --text:       #111111;
+      --muted:      #6b7280;
+      --border:     #e4e7ec;
+      --bg:         #f5f6f8;
+    }
+
+    body {
+      font-family: 'Archivo', 'ArchivoNarrow', -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    header {
+      background: var(--dark);
+      color: white;
+      padding: 0 28px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      height: 64px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .logo-img { height: 28px; display: block; }
+    .header-divider { width: 1px; height: 24px; background: rgba(255,255,255,0.15); }
+    .header-label {
+      font-size: 0.72rem; font-weight: 700; letter-spacing: 0.15em;
+      text-transform: uppercase; color: rgba(255,255,255,0.45);
+    }
+    .header-spacer { flex: 1; }
+    .header-right { display: flex; align-items: center; gap: 12px; }
+    .church-count-badge {
+      background: var(--blue); color: white; font-size: 0.72rem;
+      font-weight: 700; letter-spacing: 0.08em; padding: 4px 12px;
+      border-radius: 20px; text-transform: uppercase;
+    }
+    .data-freshness {
+      font-size: 0.7rem; color: rgba(255,255,255,0.3);
+      font-weight: 500; white-space: nowrap;
+    }
+    .back-btn {
+      background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15);
+      color: white; padding: 6px 14px; border-radius: 6px; cursor: pointer;
+      font-family: inherit; font-size: 0.8rem; font-weight: 600;
+      letter-spacing: 0.04em; display: none; align-items: center; gap: 6px;
+      text-transform: uppercase; transition: background 0.15s;
+    }
+    .back-btn:hover { background: rgba(255,255,255,0.18); }
+    .back-btn.visible { display: flex; }
+
+    /* ── Views ── */
+    #directory-view { display: block; }
+    #profile-view   { display: none; }
+
+    /* ── Search + Filter ── */
+    .search-section { background: var(--dark); padding: 20px 28px; }
+    .search-inner { max-width: 1040px; margin: 0 auto; display: flex; gap: 12px; align-items: center; }
+    .search-wrap { position: relative; flex: 1; }
+    .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); opacity: 0.4; pointer-events: none; }
+    #search-input {
+      width: 100%; padding: 12px 16px 12px 42px; border: 2px solid rgba(255,255,255,0.12);
+      border-radius: 8px; font-family: inherit; font-size: 0.95rem; font-weight: 500;
+      background: rgba(255,255,255,0.07); color: white; outline: none;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    #search-input::placeholder { color: rgba(255,255,255,0.3); }
+    #search-input:focus { border-color: var(--blue); background: rgba(255,255,255,0.1); }
+
+    .filter-btns { display: flex; gap: 8px; flex-shrink: 0; }
+    .filter-btn {
+      padding: 10px 16px; border: 2px solid rgba(255,255,255,0.15); border-radius: 8px;
+      background: transparent; font-family: inherit; font-size: 0.75rem; font-weight: 700;
+      letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer;
+      color: rgba(255,255,255,0.5); transition: all 0.15s; white-space: nowrap;
+    }
+    .filter-btn:hover { border-color: rgba(255,255,255,0.4); color: white; }
+    .filter-btn.active { background: var(--blue); border-color: var(--blue); color: white; }
+
+    /* ── Network stats bar ── */
+    .stats-bar { background: var(--surface); border-bottom: 1px solid rgba(255,255,255,0.06); padding: 0 28px; }
+    .stats-bar-inner { max-width: 1040px; margin: 0 auto; display: flex; gap: 32px; padding: 14px 0; flex-wrap: wrap; }
+    .stat-item { display: flex; flex-direction: column; gap: 2px; }
+    .stat-item .num { font-size: 1.1rem; font-weight: 800; color: white; letter-spacing: -0.01em; }
+    .stat-item .lbl { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.35); }
+    .stat-item.highlight .num { color: var(--lime); }
+
+    /* ── Directory ── */
+    .directory-wrap { max-width: 1040px; margin: 0 auto; padding: 28px 24px; }
+    .results-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+    .results-count { font-size: 0.78rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+
+    /* ── Church cards ── */
+    .church-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+    .church-card {
+      background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+      overflow: hidden; cursor: pointer; transition: box-shadow 0.15s, transform 0.1s;
+    }
+    .church-card:hover { box-shadow: 0 6px 24px rgba(39,86,224,0.12); transform: translateY(-2px); }
+    .card-accent { height: 4px; background: var(--blue); }
+    .church-card.stage-1 .card-accent { background: var(--lime); }
+    .church-card.stage-2 .card-accent { background: linear-gradient(90deg, var(--blue), var(--lime)); }
+    .church-card.stage-3 .card-accent { background: var(--blue); }
+
+    .card-body { padding: 20px; }
+    .card-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 14px; }
+    .church-initials {
+      width: 42px; height: 42px; border-radius: 8px; background: var(--blue-light);
+      color: var(--blue); font-weight: 800; font-size: 0.95rem; display: flex;
+      align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .church-card.stage-1 .church-initials { background: #f0ffd6; color: #4a7c00; }
+
+    .stage-badge {
+      font-size: 0.65rem; font-weight: 800; padding: 3px 9px; border-radius: 20px;
+      text-transform: uppercase; letter-spacing: 0.08em;
+    }
+    .stage-1-badge { background: #f0ffd6; color: #4a7c00; }
+    .stage-2-badge { background: #fff3cd; color: #7a5500; }
+    .stage-3-badge { background: #e8eeff; color: var(--blue); }
+
+    .church-name { font-size: 1rem; font-weight: 800; letter-spacing: -0.01em; margin-bottom: 3px; line-height: 1.25; text-transform: uppercase; }
+    .church-meta { font-size: 0.8rem; color: var(--muted); font-weight: 500; margin-bottom: 14px; }
+
+    .card-stats { display: flex; border-top: 1px solid var(--border); margin: 0 -20px -20px; }
+    .card-stat { flex: 1; padding: 12px 10px; display: flex; flex-direction: column; align-items: center; gap: 2px; border-right: 1px solid var(--border); }
+    .card-stat:last-child { border-right: none; }
+    .card-stat .v { font-size: 1.05rem; font-weight: 800; color: var(--text); letter-spacing: -0.01em; }
+    .card-stat .l { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: var(--muted); }
+
+    /* ── Profile view ── */
+    .profile-wrap { max-width: 860px; margin: 0 auto; padding: 36px 24px; }
+
+    .profile-hero {
+      background: var(--dark); border-radius: 14px; padding: 32px;
+      margin-bottom: 20px; position: relative; overflow: hidden;
+    }
+    .hero-bg { position: absolute; right: -10px; top: 50%; transform: translateY(-50%); opacity: 0.03; font-size: 11rem; font-weight: 900; color: white; pointer-events: none; user-select: none; line-height: 1; }
+    .hero-top { display: flex; align-items: flex-start; gap: 20px; margin-bottom: 20px; }
+    .profile-initials {
+      width: 60px; height: 60px; border-radius: 12px; background: var(--blue); color: white;
+      font-weight: 800; font-size: 1.3rem; display: flex; align-items: center;
+      justify-content: center; flex-shrink: 0;
+    }
+    .profile-title h2 { font-size: 1.6rem; font-weight: 900; color: white; letter-spacing: -0.02em; text-transform: uppercase; line-height: 1.1; margin-bottom: 6px; }
+    .profile-title .loc { font-size: 0.85rem; color: rgba(255,255,255,0.45); font-weight: 500; }
+    .hero-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+    .hero-chip {
+      font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+      padding: 5px 12px; border-radius: 6px; background: rgba(255,255,255,0.08);
+      color: rgba(255,255,255,0.6); border: 1px solid rgba(255,255,255,0.1);
+    }
+    .hero-chip.blue  { background: var(--blue); color: white; border-color: var(--blue); }
+    .hero-chip.lime  { background: var(--lime); color: #1a3000; border-color: var(--lime); }
+    .hero-chip a     { color: inherit; text-decoration: none; }
+
+    .profile-section { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin-bottom: 16px; }
+    .section-header { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; padding-bottom: 14px; border-bottom: 1px solid var(--border); }
+    .section-bar { width: 3px; height: 18px; background: var(--blue); border-radius: 2px; flex-shrink: 0; }
+    .section-title { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text); }
+
+    /* Year tabs */
+    .year-tabs { display: flex; gap: 8px; margin-left: auto; }
+    .year-tab {
+      font-size: 0.7rem; font-weight: 700; padding: 4px 10px; border-radius: 6px;
+      border: 1px solid var(--border); background: transparent; cursor: pointer;
+      font-family: inherit; color: var(--muted); transition: all 0.12s;
+    }
+    .year-tab.active { background: var(--blue); color: white; border-color: var(--blue); }
+
+    .big-stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 12px; }
+    .big-stat { background: var(--bg); border-radius: 10px; padding: 16px 14px; display: flex; flex-direction: column; align-items: center; text-align: center; }
+    .big-stat .num { font-size: 1.8rem; font-weight: 900; color: var(--blue); letter-spacing: -0.03em; line-height: 1; margin-bottom: 4px; }
+    .big-stat .lbl { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+    .big-stat .delta { font-size: 0.7rem; font-weight: 700; margin-top: 4px; }
+    .delta-up   { color: #16a34a; }
+    .delta-down { color: #dc2626; }
+
+    .info-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 18px; }
+    .info-item label { font-size: 0.65rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 4px; }
+    .info-item .value { font-size: 0.95rem; font-weight: 600; color: var(--text); }
+    .info-item a { color: var(--blue); text-decoration: none; }
+    .info-item a:hover { text-decoration: underline; }
+
+    .pastor-card {
+      display: flex; align-items: center; gap: 14px; padding: 14px 16px;
+      background: var(--bg); border-radius: 10px; margin-bottom: 10px;
+    }
+    .pastor-avatar {
+      width: 44px; height: 44px; border-radius: 10px; background: var(--blue-light);
+      color: var(--blue); font-weight: 800; font-size: 1rem; display: flex;
+      align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .pastor-name  { font-weight: 700; font-size: 0.95rem; }
+    .pastor-email { font-size: 0.8rem; color: var(--muted); margin-top: 2px; }
+    .pastor-email a { color: var(--blue); text-decoration: none; }
+    .pastor-email a:hover { text-decoration: underline; }
+    .pco-badge { font-size: 0.65rem; font-weight: 700; background: #e8f5e9; color: #2e7d32; padding: 2px 7px; border-radius: 4px; letter-spacing: 0.05em; text-transform: uppercase; margin-left: 8px; }
+
+    .trend-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+    .trend-item { background: var(--bg); border-radius: 8px; padding: 12px 14px; }
+    .trend-label { font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 6px; }
+    .trend-values { display: flex; align-items: baseline; gap: 8px; }
+    .trend-current { font-size: 1.1rem; font-weight: 800; color: var(--text); }
+    .trend-prev { font-size: 0.8rem; color: var(--muted); }
+    .trend-arrow { font-size: 0.8rem; font-weight: 700; }
+
+    .notes-box { background: var(--bg); border-left: 3px solid var(--lime); border-radius: 0 8px 8px 0; padding: 14px 18px; font-size: 0.9rem; line-height: 1.65; }
+    .notes-box.empty { border-left-color: var(--border); color: var(--muted); font-style: italic; }
+
+    /* Loading / error states */
+    .loading-state { text-align: center; padding: 80px 20px; color: rgba(255,255,255,0.4); }
+    .loading-spinner {
+      width: 32px; height: 32px; border: 3px solid rgba(255,255,255,0.1);
+      border-top-color: var(--blue); border-radius: 50%; animation: spin 0.7s linear infinite;
+      margin: 0 auto 16px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .empty-state { text-align: center; padding: 80px 20px; color: var(--muted); }
+    .empty-state strong { display: block; font-size: 1rem; margin-bottom: 6px; color: var(--text); }
+
+    @media (max-width: 640px) {
+      .stats-bar-inner { gap: 20px; }
+      .filter-btns { display: none; }
+      .profile-title h2 { font-size: 1.2rem; }
+      .big-stats { grid-template-columns: repeat(3, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <button class="back-btn" id="back-btn" onclick="showDirectory()">&#8592; All Churches</button>
+  <img src="assets/img/logo-white.png" alt="Salt Network" class="logo-img" />
+  <div class="header-divider"></div>
+  <span class="header-label">Staff Portal</span>
+  <div class="header-spacer"></div>
+  <div class="header-right">
+    <span class="data-freshness" id="freshness-label"></span>
+    <span class="church-count-badge" id="header-count">Loading…</span>
+  </div>
+</header>
+
+<div class="search-section">
+  <div class="search-inner">
+    <div class="search-wrap">
+      <svg class="search-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <circle cx="6.5" cy="6.5" r="5" stroke="white" stroke-width="1.5"/>
+        <path d="M10.5 10.5L14 14" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      <input type="text" id="search-input" placeholder="Search by church name…" oninput="filterChurches()" />
+    </div>
+    <div class="filter-btns">
+      <button class="filter-btn active" onclick="setFilter(this,'all')">All</button>
+      <button class="filter-btn" onclick="setFilter(this,'3')">Multiplying</button>
+      <button class="filter-btn" onclick="setFilter(this,'2')">Healthy</button>
+      <button class="filter-btn" onclick="setFilter(this,'1')">Plant</button>
+    </div>
+  </div>
+</div>
+
+<div class="stats-bar">
+  <div class="stats-bar-inner">
+    <div class="stat-item"><span class="num" id="stat-churches">—</span><span class="lbl">Churches</span></div>
+    <div class="stat-item highlight"><span class="num" id="stat-attendance">—</span><span class="lbl">Fall 2025 Attendance</span></div>
+    <div class="stat-item highlight"><span class="num" id="stat-salt">—</span><span class="lbl">Fall 2025 Salt Co.</span></div>
+    <div class="stat-item"><span class="num" id="stat-baptisms">—</span><span class="lbl">2025 Baptisms</span></div>
+    <div class="stat-item"><span class="num" id="stat-leaders">—</span><span class="lbl">Student Leaders</span></div>
+  </div>
+</div>
+
+<!-- Directory -->
+<div id="directory-view">
+  <div class="directory-wrap">
+    <div class="results-row">
+      <span class="results-count" id="results-count"></span>
+    </div>
+    <div id="church-grid">
+      <div class="loading-state">
+        <div class="loading-spinner"></div>
+        <div style="color:white;font-weight:600">Loading church data…</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Profile -->
+<div id="profile-view">
+  <div class="profile-wrap" id="profile-content"></div>
+</div>
+
+<script>
+// ── Helpers ─────────────────────────────────────────────────────────────────
+function initials(name) {
+  return name.split(/\s+/).filter(w => /^[A-Za-z]/.test(w)).slice(0,2).map(w=>w[0].toUpperCase()).join('') || '??';
+}
+function fmt(n) {
+  if (n === null || n === undefined || n === '') return '—';
+  const num = typeof n === 'string' ? parseFloat(n.replace(/[^0-9.-]/g,'')) : n;
+  return isNaN(num) ? '—' : num.toLocaleString();
+}
+function fmtDollars(n) {
+  if (!n && n !== 0) return '—';
+  const num = typeof n === 'string' ? parseFloat(n.replace(/[^0-9.-]/g,'')) : n;
+  if (isNaN(num)) return '—';
+  return '$' + Math.round(num).toLocaleString();
+}
+function stageLabel(s) {
+  if (s == 3) return 'Multiplying';
+  if (s == 2) return 'Healthy';
+  if (s == 1) return 'Plant';
+  return 'Unknown';
+}
+function stageBadgeClass(s) {
+  if (s == 3) return 'stage-3-badge';
+  if (s == 2) return 'stage-2-badge';
+  return 'stage-1-badge';
+}
+function deltaHtml(val) {
+  if (!val && val !== 0) return '';
+  const n = typeof val === 'string' ? parseFloat(val.replace(/[^0-9.-]/g,'')) : val;
+  if (isNaN(n)) return '';
+  const sign = n > 0 ? '+' : '';
+  const cls  = n > 0 ? 'delta-up' : n < 0 ? 'delta-down' : '';
+  return `<div class="delta ${cls}">${sign}${Math.round(n).toLocaleString()}</div>`;
+}
+
+// ── Google Sheets gviz fetch ─────────────────────────────────────────────────
+async function fetchSheet(tabName) {
+  const url = `https://docs.google.com/spreadsheets/d/${CONFIG.SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(tabName)}`;
+  const res = await fetch(url);
+  const text = await res.text();
+  // Strip the JSONP wrapper: google.visualization.Query.setResponse({...});
+  const jsonStr = text.replace(/^[^(]*\(/, '').replace(/\);?\s*$/, '');
+  const data = JSON.parse(jsonStr);
+  if (!data.table) return [];
+
+  const cols = data.table.cols.map(c => c.label || c.id);
+  return data.table.rows
+    .filter(r => r && r.c && r.c[0] && r.c[0].v)  // skip blank rows
+    .map(r => {
+      const obj = {};
+      r.c.forEach((cell, i) => {
+        obj[cols[i]] = cell ? (cell.v !== null && cell.v !== undefined ? cell.v : '') : '';
+      });
+      return obj;
+    });
+}
+
+// ── Column mapping helper ────────────────────────────────────────────────────
+// Finds a column value by partial/fuzzy key match (case-insensitive)
+function col(row, ...keywords) {
+  const key = Object.keys(row).find(k =>
+    keywords.every(kw => k.toLowerCase().includes(kw.toLowerCase()))
+  );
+  return key ? row[key] : null;
+}
+
+// ── Data normalization ───────────────────────────────────────────────────────
+function normalizeCurrentRow(r) {
+  return {
+    name:             col(r, 'Church') || '',
+    establishDate:    col(r, 'Establish') || '',
+    attendance:       col(r, 'Fall 2025', 'Attendance') || col(r, '2025', 'Attendance') || '',
+    saltAttendance:   col(r, 'Fall 2025', 'Salt') || col(r, '2025', 'Salt') || '',
+    baptisms:         col(r, '2025', 'Baptism') || col(r, 'Total Baptism') || '',
+    kickoff:          col(r, 'Kickoff') || '',
+    studentLeaders:   col(r, 'Student Leader') || '',
+    sbcGiving:        col(r, '2025', 'SBC') || col(r, 'SBC Giving') || '',
+    stage:            col(r, 'Stage') || '',
+    expoLevel:        col(r, 'Exponential') || '',
+    campusEnrollment: col(r, 'Campus Enrollment') || '',
+    reachPct:         col(r, 'Reach') || '',
+    yearsMinistry:    col(r, 'Full Years') || col(r, 'Years') || '',
+    saltDelta:        col(r, 'Salt', '2024') || '',
+    baptismDelta:     col(r, 'Baptism', '2024') || '',
+    leaderPct:        col(r, 'Student Leaders as %') || col(r, 'Leader', '%') || '',
+    _raw: r,
+  };
+}
+
+function normalizePrevRow(r) {
+  return {
+    name:           col(r, 'Church') || '',
+    attendance:     col(r, 'Fall 2024', 'Attendance') || col(r, '2024', 'Attendance') || '',
+    saltAttendance: col(r, 'Fall 2024', 'Salt') || col(r, '2024', 'Salt') || '',
+    baptisms:       col(r, '2024', 'Baptism') || col(r, 'Baptism') || '',
+    sbcGiving:      col(r, '2024', 'SBC') || col(r, 'SBC Giving') || '',
+    stage:          col(r, 'Stage') || '',
+  };
+}
+
+// ── State ────────────────────────────────────────────────────────────────────
+let churches    = [];
+let prevYear    = {};
+let activeFilter = 'all';
+
+// ── Boot ─────────────────────────────────────────────────────────────────────
+async function loadData() {
+  try {
+    const [currentRows, prevRows] = await Promise.all([
+      fetchSheet(CONFIG.SHEETS.current),
+      fetchSheet(CONFIG.SHEETS.previous),
+    ]);
+
+    // Build previous-year lookup by church name
+    prevYear = {};
+    prevRows.forEach(r => {
+      const norm = normalizePrevRow(r);
+      if (norm.name) prevYear[norm.name.trim()] = norm;
+    });
+
+    // Filter to rows that look like church data (skip totals rows, blanks)
+    const SKIP = ['total', 'cornerstone direct', 'cornerstone kids', 'less than', '250-1,000', '1,000+'];
+    churches = currentRows
+      .map(normalizeCurrentRow)
+      .filter(c => c.name && !SKIP.some(s => c.name.toLowerCase().includes(s)));
+
+    updateNetworkStats();
+    renderDirectory(churches);
+    document.getElementById('freshness-label').textContent = 'Live from Google Sheets';
+  } catch (err) {
+    console.error('Failed to load sheet data:', err);
+    document.getElementById('church-grid').innerHTML =
+      `<div class="empty-state"><strong>Could not load data.</strong><span>Check console for details. Make sure the sheet is shared as "Anyone with the link can view."</span></div>`;
+  }
+}
+
+function updateNetworkStats() {
+  const totalAtt    = churches.reduce((s,c) => s + (parseFloat(String(c.attendance).replace(/[^0-9.]/g,''))||0), 0);
+  const totalSalt   = churches.reduce((s,c) => s + (parseFloat(String(c.saltAttendance).replace(/[^0-9.]/g,''))||0), 0);
+  const totalBapt   = churches.reduce((s,c) => s + (parseFloat(String(c.baptisms).replace(/[^0-9.]/g,''))||0), 0);
+  const totalLeader = churches.reduce((s,c) => s + (parseFloat(String(c.studentLeaders).replace(/[^0-9.]/g,''))||0), 0);
+
+  document.getElementById('stat-churches').textContent   = fmt(churches.length);
+  document.getElementById('stat-attendance').textContent = fmt(Math.round(totalAtt));
+  document.getElementById('stat-salt').textContent       = fmt(Math.round(totalSalt));
+  document.getElementById('stat-baptisms').textContent   = fmt(Math.round(totalBapt));
+  document.getElementById('stat-leaders').textContent    = fmt(Math.round(totalLeader));
+  document.getElementById('header-count').textContent    = `${churches.length} Churches`;
+}
+
+function renderDirectory(list) {
+  const grid  = document.getElementById('church-grid');
+  const count = document.getElementById('results-count');
+  count.textContent = list.length === churches.length
+    ? `${churches.length} churches`
+    : `${list.length} of ${churches.length} churches`;
+
+  if (!list.length) {
+    grid.innerHTML = '<div class="empty-state"><strong>No churches match.</strong></div>';
+    return;
+  }
+
+  grid.innerHTML = list.map(c => {
+    const stage = String(c.stage || '').trim();
+    return `
+    <div class="church-card stage-${stage}" onclick="showProfile(${JSON.stringify(c.name).replace(/"/g,'&quot;')})">
+      <div class="card-accent"></div>
+      <div class="card-body">
+        <div class="card-top">
+          <div class="church-initials">${initials(c.name)}</div>
+          <span class="stage-badge ${stageBadgeClass(stage)}">${stageLabel(stage)}</span>
+        </div>
+        <div class="church-name">${c.name}</div>
+        <div class="church-meta">Est. ${c.establishDate || '—'}${c.yearsMinistry ? ` &middot; ${c.yearsMinistry} yrs` : ''}</div>
+      </div>
+      <div class="card-stats">
+        <div class="card-stat"><span class="v">${fmt(c.attendance)}</span><span class="l">Attendance</span></div>
+        <div class="card-stat"><span class="v">${fmt(c.saltAttendance)}</span><span class="l">Salt Co.</span></div>
+        <div class="card-stat"><span class="v">${fmt(c.baptisms)}</span><span class="l">Baptisms</span></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function filterChurches() {
+  const q = document.getElementById('search-input').value.toLowerCase().trim();
+  let list = churches;
+  if (activeFilter !== 'all') list = list.filter(c => String(c.stage).trim() === activeFilter);
+  if (q) list = list.filter(c => c.name.toLowerCase().includes(q));
+  renderDirectory(list);
+}
+
+function setFilter(btn, filter) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  activeFilter = filter;
+  filterChurches();
+}
+
+// ── Profile view ─────────────────────────────────────────────────────────────
+function showProfile(name) {
+  const c    = churches.find(x => x.name === name);
+  const prev = prevYear[name.trim()] || {};
+  if (!c) return;
+
+  document.getElementById('directory-view').style.display = 'none';
+  document.getElementById('profile-view').style.display   = 'block';
+  document.getElementById('back-btn').classList.add('visible');
+  window.scrollTo(0, 0);
+
+  const stage    = String(c.stage || '').trim();
+  const chipCls  = stage === '1' ? 'lime' : 'blue';
+
+  // Trend rows: current vs prev year
+  function trendItem(label, cur, prv) {
+    const curN = parseFloat(String(cur||'').replace(/[^0-9.]/g,''));
+    const prvN = parseFloat(String(prv||'').replace(/[^0-9.]/g,''));
+    const diff = (!isNaN(curN) && !isNaN(prvN)) ? curN - prvN : null;
+    const arrow = diff === null ? '' : diff > 0
+      ? `<span class="trend-arrow delta-up">▲ ${Math.abs(Math.round(diff)).toLocaleString()}</span>`
+      : diff < 0
+      ? `<span class="trend-arrow delta-down">▼ ${Math.abs(Math.round(diff)).toLocaleString()}</span>`
+      : `<span class="trend-arrow" style="color:var(--muted)">—</span>`;
+    return `
+      <div class="trend-item">
+        <div class="trend-label">${label}</div>
+        <div class="trend-values">
+          <span class="trend-current">${fmt(cur)}</span>
+          ${prv ? `<span class="trend-prev">vs ${fmt(prv)}</span>` : ''}
+          ${arrow}
+        </div>
+      </div>`;
+  }
+
+  // Pastor section — PCO or placeholder
+  const pastorHtml = CONFIG.PLANNING_CENTER.enabled
+    ? `<div id="pastor-section"><div style="color:var(--muted);font-size:0.85rem;padding:8px 0">Loading from Planning Center…</div></div>`
+    : `<div class="pastor-card">
+        <div class="pastor-avatar">${initials(c.name)}</div>
+        <div>
+          <div class="pastor-name" style="color:var(--muted);font-style:italic">Not yet connected</div>
+          <div class="pastor-email">Add your Planning Center token in config.js to see pastor info</div>
+        </div>
+       </div>`;
+
+  document.getElementById('profile-content').innerHTML = `
+    <div class="profile-hero">
+      <div class="hero-bg">&raquo;</div>
+      <div class="hero-top">
+        <div class="profile-initials">${initials(c.name)}</div>
+        <div class="profile-title">
+          <h2>${c.name}</h2>
+          <div class="loc">Established ${c.establishDate || '—'}${c.yearsMinistry ? ` &middot; ${c.yearsMinistry} full years of ministry` : ''}</div>
+        </div>
+      </div>
+      <div class="hero-chips">
+        <span class="hero-chip ${chipCls}">${stageLabel(stage)}</span>
+        ${c.expoLevel ? `<span class="hero-chip">Level ${c.expoLevel} Exponential</span>` : ''}
+        ${c.campusEnrollment ? `<span class="hero-chip">Campus: ${fmt(c.campusEnrollment)} students</span>` : ''}
+        ${c.reachPct ? `<span class="hero-chip">${typeof c.reachPct === 'number' ? (c.reachPct*100).toFixed(1) : c.reachPct}% Reach</span>` : ''}
+      </div>
+    </div>
+
+    <div class="profile-section">
+      <div class="section-header">
+        <div class="section-bar"></div>
+        <span class="section-title">2025–2026 Metrics</span>
+      </div>
+      <div class="big-stats">
+        <div class="big-stat"><span class="num">${fmt(c.attendance)}</span><span class="lbl">Fall Attendance</span>${deltaHtml(c.saltDelta)}</div>
+        <div class="big-stat"><span class="num">${fmt(c.saltAttendance)}</span><span class="lbl">Fall Salt Co.</span></div>
+        <div class="big-stat"><span class="num">${fmt(c.baptisms)}</span><span class="lbl">2025 Baptisms</span>${deltaHtml(c.baptismDelta)}</div>
+        <div class="big-stat"><span class="num">${fmt(c.kickoff)}</span><span class="lbl">Fall Kickoff</span></div>
+        <div class="big-stat"><span class="num">${fmt(c.studentLeaders)}</span><span class="lbl">Student Leaders</span></div>
+        <div class="big-stat"><span class="num">${c.leaderPct ? (typeof c.leaderPct === 'number' ? (c.leaderPct*100).toFixed(1)+'%' : c.leaderPct) : '—'}</span><span class="lbl">Leader %</span></div>
+      </div>
+    </div>
+
+    <div class="profile-section">
+      <div class="section-header">
+        <div class="section-bar"></div>
+        <span class="section-title">Year-over-Year</span>
+      </div>
+      <div class="trend-row">
+        ${trendItem('Attendance', c.attendance, prev.attendance)}
+        ${trendItem('Salt Company', c.saltAttendance, prev.saltAttendance)}
+        ${trendItem('Baptisms', c.baptisms, prev.baptisms)}
+        ${trendItem('SBC Giving', c.sbcGiving, prev.sbcGiving)}
+      </div>
+    </div>
+
+    <div class="profile-section">
+      <div class="section-header">
+        <div class="section-bar"></div>
+        <span class="section-title">Giving</span>
+      </div>
+      <div class="info-grid">
+        <div class="info-item"><label>2025 SBC Giving</label><span class="value">${fmtDollars(c.sbcGiving)}</span></div>
+        <div class="info-item"><label>2024 SBC Giving</label><span class="value">${fmtDollars(prev.sbcGiving)}</span></div>
+      </div>
+    </div>
+
+    <div class="profile-section">
+      <div class="section-header">
+        <div class="section-bar"></div>
+        <span class="section-title">Pastor &amp; Contacts</span>
+        ${CONFIG.PLANNING_CENTER.enabled ? '<span class="pco-badge">Planning Center</span>' : ''}
+      </div>
+      ${pastorHtml}
+    </div>
+  `;
+
+  if (CONFIG.PLANNING_CENTER.enabled) {
+    loadPCOContacts(c.name);
+  }
+}
+
+function showDirectory() {
+  document.getElementById('directory-view').style.display = 'block';
+  document.getElementById('profile-view').style.display   = 'none';
+  document.getElementById('back-btn').classList.remove('visible');
+  window.scrollTo(0, 0);
+}
+
+// ── Planning Center ──────────────────────────────────────────────────────────
+// Requests go to /api/pco/... which server.js proxies to planningcenteronline.com
+// so credentials never leave the local server and CORS is not an issue.
+const PCO = '/api/pco/people/v2';
+
+async function loadPCOContacts(churchName) {
+  const section = document.getElementById('pastor-section');
+  if (!section) return;
+
+  try {
+    // Find field_data records where "Network Church" (field def 1060956) = churchName
+    const encoded = encodeURIComponent(churchName);
+    const fdRes = await fetch(
+      `${PCO}/field_data?where[field_definition_id]=1060956&where[value]=${encoded}&include=customizable&per_page=25`
+    );
+    const fdData = await fdRes.json();
+
+    if (!fdData.data || !fdData.data.length) {
+      section.innerHTML = `<div style="color:var(--muted);font-size:0.85rem;padding:8px 0">No contacts found in Planning Center for "${churchName}".</div>`;
+      return;
+    }
+
+    // Extract person IDs from the field_data relationships
+    const personIds = fdData.data
+      .filter(fd => fd.relationships?.customizable?.data?.type === 'Person')
+      .map(fd => fd.relationships.customizable.data.id);
+
+    if (!personIds.length) {
+      section.innerHTML = `<div style="color:var(--muted);font-size:0.85rem;padding:8px 0">No contacts found in Planning Center for "${churchName}".</div>`;
+      return;
+    }
+
+    // Fetch each person with contact details
+    const people = await Promise.all(personIds.map(id =>
+      fetch(`${PCO}/people/${id}?include=emails,phone_numbers`).then(r => r.json())
+    ));
+
+    section.innerHTML = people.map(p => {
+      const person = p.data;
+      if (!person) return '';
+      const emails = (p.included || []).filter(i => i.type === 'Email');
+      const phones = (p.included || []).filter(i => i.type === 'PhoneNumber');
+      const primaryEmail = emails.find(e => e.attributes.primary) || emails[0];
+      const primaryPhone = phones.find(ph => ph.attributes.primary) || phones[0];
+      const avatar = person.attributes.avatar;
+      const avatarHtml = avatar
+        ? `<img src="${avatar}" style="width:44px;height:44px;border-radius:10px;object-fit:cover;flex-shrink:0;" />`
+        : `<div class="pastor-avatar">${initials(person.attributes.name)}</div>`;
+
+      return `
+        <div class="pastor-card">
+          ${avatarHtml}
+          <div style="flex:1;min-width:0">
+            <div class="pastor-name">${person.attributes.name}</div>
+            <div class="pastor-email">
+              ${primaryEmail ? `<a href="mailto:${primaryEmail.attributes.address}">${primaryEmail.attributes.address}</a>` : ''}
+              ${primaryPhone ? ` &middot; <a href="tel:${primaryPhone.attributes.number}">${primaryPhone.attributes.number}</a>` : ''}
+            </div>
+          </div>
+        </div>`;
+    }).join('');
+
+  } catch (err) {
+    console.error('PCO fetch error:', err);
+    section.innerHTML = `<div style="color:var(--muted);font-size:0.85rem;padding:8px 0">Could not load Planning Center data.</div>`;
+  }
+}
+
+// ── Start ─────────────────────────────────────────────────────────────────────
+loadData();
+</script>
+</body>
+</html>
