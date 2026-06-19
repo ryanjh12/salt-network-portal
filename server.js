@@ -19,6 +19,9 @@ const PCO_APP_ID    = process.env.PCO_APP_ID;
 const PCO_SECRET    = process.env.PCO_SECRET;
 const PORTAL_PASS   = process.env.PORTAL_PASSWORD;
 
+console.log('ENV CHECK — PCO_APP_ID:', PCO_APP_ID ? 'SET' : 'MISSING', '| PCO_SECRET:', PCO_SECRET ? 'SET' : 'MISSING', '| PORTAL_PASSWORD:', PORTAL_PASS ? 'SET' : 'MISSING');
+console.log('All env keys:', Object.keys(process.env).filter(k => k.startsWith('PCO') || k.startsWith('PORTAL')));
+
 if (!PCO_APP_ID || !PCO_SECRET) {
   console.error('\n  ERROR: PCO_APP_ID and PCO_SECRET must be set in environment or .env file\n');
   process.exit(1);
